@@ -36,6 +36,7 @@ async function callApi(apiUrl: string,) {
         console.log({myRes});
         if (myRes) {
                 result = myRes;
+                break;
             }
         } catch (e) {
             console.error(e);
