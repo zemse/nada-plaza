@@ -13,19 +13,26 @@ export const Login = () => {
     "090457f88be8a82c39533e68edbb055e899152a0aff6a4402f9f31f2cc87fae4";
 
   const [isLoading, setIsLoading] = useState(false);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     console.log("authenticated", authenticated);
   }, [authenticated]);
 
   const handleLogin = async () => {
+    const wallet = await createSignerFromKey(SECRET_KEY);
+    const acc = await wallet.getAccounts();
+    setAddress(acc[0].address);
+
     try {
       setIsLoading(true);
       const credentials: UserCredentials = {
         userSeed: SEED,
-        signer: () => createSignerFromKey(SECRET_KEY),
+        signer: async () => wallet,
       };
+      console.log("start 1");
       await login(credentials);
+      console.log("start last");
     } catch (err) {
       console.error(err);
     } finally {
@@ -47,13 +54,16 @@ export const Login = () => {
   return (
     <div className="flex-row flex my-6">
       {authenticated ? (
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleLogout}
-          disabled={isLoading}
-        >
-          {isLoading ? "Logging out..." : "Logout"}
-        </button>
+        <>
+          Your address: {address}
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleLogout}
+            disabled={isLoading}
+          >
+            {isLoading ? "Logging out..." : "Logout"}
+          </button>
+        </>
       ) : (
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
