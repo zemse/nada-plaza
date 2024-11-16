@@ -64,6 +64,7 @@ export default function NFCDataDisplay({ data, onClose }: NFCDataDisplayProps) {
             }),
           },
         );
+
         if (!response.ok) {
           throw new Error("Failed to fetch user profile");
         }
@@ -116,7 +117,7 @@ export default function NFCDataDisplay({ data, onClose }: NFCDataDisplayProps) {
         <div className="space-y-6">
           <div className="flex flex-col items-center">
             <img
-              src={`http://localhost:3000/api/img?url=${encodeURIComponent(userProfile.avatar.fullUrl)}`}
+              src={`/api/img?url=${encodeURIComponent(userProfile.avatar.fullUrl)}`}
               alt={userProfile.name}
               className="w-32 h-32 rounded-full object-cover shadow-lg"
             />

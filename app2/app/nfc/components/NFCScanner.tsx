@@ -1,5 +1,3 @@
-"use client";
-
 import { Scan } from "lucide-react";
 import { useState } from "react";
 import NFCDataDisplay from "./NFCDataDisplay";
