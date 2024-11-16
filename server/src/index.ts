@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { callApi } from "./helper.js";
 import { cors } from "hono/cors";
 import { PersistentMap } from "./store.js";
+import "dotenv/config";
 
 const app = new Hono();
 app.use("/*", cors());
@@ -39,6 +40,34 @@ app.get("/get-storeid", async (c) => {
   }
   const storeid = map.get(uid);
   return c.json({ success: !!storeid, storeid });
+});
+
+app.get("/get-connections", async (c) => {
+  let account = c.req.query("account");
+  const res = await fetch("https://api.ethglobal.com/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: process.env[`a_${account}`] as string,
+      Origin: "https://ethglobal.com",
+    },
+    body: JSON.stringify({
+      operationName: "getInteractionsSelfPaginated",
+      variables: { pagination: { take: 1000 } },
+      query:
+        "query getInteractionsSelfPaginated($pagination: Pagination!, $filters: InteractionFilters) {\n  getInteractionsSelfPaginated(pagination: $pagination, filters: $filters) {\n    uuid\n    type\n    createdAt\n    verifiedAt\n    targetId\n    targetName\n    target {\n      user {\n        name\n        email\n        twitter\n        discord\n        discordId\n        farcaster\n        telegram\n        linkedin\n        github\n        website\n        title\n        bio\n        avatar {\n          fullUrl\n          __typename\n        }\n        __typename\n      }\n      schedule {\n        name\n        __typename\n      }\n      __typename\n    }\n    connectedUser {\n      name\n      title\n      bio\n      email\n      twitter\n      discord\n      discordId\n      farcaster\n      telegram\n      linkedin\n      github\n      website\n      avatar {\n        fullUrl\n        __typename\n      }\n      __typename\n    }\n    event {\n      name\n      timezone {\n        name\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
+    }),
+  });
+  const data = await res.json();
+  let result = new Set();
+  data.data.getInteractionsSelfPaginated.forEach((element: any) => {
+    if (element.type === "attendee_met") {
+      if (element.connectedUser) {
+        result.add(element.connectedUser.name);
+      }
+    }
+  });
+  return c.json(Array.from(result));
 });
 
 const port = 3000;
