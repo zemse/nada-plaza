@@ -16,21 +16,32 @@ interface NFCData {
 }
 
 export default function NFCScanner() {
-  let value = {
-    serialNumber: "bf:a5:0e:28",
+  // let value = {
+  //   serialNumber: "bf:a5:0e:28",
+  //   records: [
+  //     {
+  //       recordType: "url",
+  //       data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04E5F2EBA3C08694A541F8094C8065E5B43DB97C2BEE4CDB947BAFA8AA4AFE7B6836EF7AF322D142DF4555A10B12A07345C59FB0A9EF443C969C3526C94C94F4E5&latch1=A978F410877F3140D9CF66E0F4EC2D5061BBEB19E94FDD99D421D3ECB660B1CE&cmd=0000&res=00",
+  //     },
+  //   ],
+  //   timestamp: "11/17/2024, 3:31:27 AM",
+  // };
+
+  let val_saurav = {
+    serialNumber: "bf:d7:0d:28",
     records: [
       {
         recordType: "url",
-        data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04E5F2EBA3C08694A541F8094C8065E5B43DB97C2BEE4CDB947BAFA8AA4AFE7B6836EF7AF322D142DF4555A10B12A07345C59FB0A9EF443C969C3526C94C94F4E5&latch1=A978F410877F3140D9CF66E0F4EC2D5061BBEB19E94FDD99D421D3ECB660B1CE&cmd=0000&res=00",
+        data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04034414C24D036EC44F46D093885FB7C5494FEDFAD284B77F021B264F2942AAAE4BDC4E6FCC547F906FAC0E2126E4D672FCBFF6D5CC5877D53FE903A08CF82D68&latch1=74C578821766E9DC6D73E02F2BDE4C827DBED198F82A80B623A37C3057ECE6A5&cmd=0000&res=00",
       },
     ],
-    timestamp: "11/17/2024, 3:31:27 AM",
+    timestamp: "11/17/2024, 6:38:04 AM",
   };
   // let value = {};
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<NFCData | null>(value);
+  const [scannedData, setScannedData] = useState<NFCData | null>(val_saurav);
 
   const parseNDEFMessage = (message: any) => {
     return Array.from(message.records).map((record: any) => {
@@ -71,11 +82,13 @@ export default function NFCScanner() {
 
       ndef.addEventListener("reading", ({ message, serialNumber }: any) => {
         const records = parseNDEFMessage(message);
-        setScannedData({
+        let obj = {
           serialNumber,
           records,
           timestamp: new Date().toLocaleString(),
-        });
+        };
+        console.log(obj);
+        setScannedData(obj);
         setScanning(false);
       });
     } catch (err) {

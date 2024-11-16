@@ -48,10 +48,14 @@ export default function ConnectionSubmitter() {
       if (!pkhash) {
         throw new Error("pkhash is empty, this should not happen");
       }
-      await axios.post("https://api.nadaplaza.bytes31.com/post-uid-storeid", {
-        uid: pkhash,
-        storeid: result,
-      });
+      const api_result = await axios.post(
+        "https://api.nadaplaza.bytes31.com/post-uid-storeid",
+        {
+          uid: pkhash,
+          storeid: result,
+        },
+      );
+      console.log("post api result", api_result.data);
     } catch (err) {
       alert(err);
       setProgress(0);
