@@ -60,7 +60,14 @@ export default function NFCDataDisplay({ data, onClose }: NFCDataDisplayProps) {
         let pk = ethers.dataLength(pk1) == 65 ? ethers.dataSlice(pk1, 1) : pk1;
         let _pkhash = ethers.keccak256(pk);
         setPkhash(_pkhash);
-        window.localStorage.setItem("pkhash", _pkhash);
+        let pkhash_stored = window.localStorage.getItem("pkhash");
+        if (pkhash_stored === null) {
+          // first time tapping the band
+          window.localStorage.setItem("pkhash", _pkhash);
+        } else if (pkhash_stored !== _pkhash) {
+          // tapping other band
+          window.localStorage.setItem("pkhash2", _pkhash);
+        }
 
         const response = await fetch(
           "https://api.nadaplaza.bytes31.com/trsage",

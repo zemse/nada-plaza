@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { randomBytes, hexlify } from "ethers";
 import { createSignerFromKey } from "@nillion/client-payments";
 import { useNillionAuth } from "@nillion/client-react-hooks";
+import { useLocalStorage } from "./useLocalStorage";
 
 export function useWallet() {
-  const [key, setKey] = useState("");
   const [address, setAddress] = useState("");
   const { login } = useNillionAuth();
   const [progress, setProgress] = useState<number>(0);
@@ -20,15 +20,8 @@ export function useWallet() {
   //   }
   // }, []);
 
-  useEffect(() => {
-    setInterval(async () => {
-      // wait for NFC card to be scanned and the pkhash to be set
-      const key = window.localStorage.getItem("pkhash");
-      if (key) {
-        setKey(key);
-      }
-    }, 50);
-  }, []);
+  const { pkhash } = useLocalStorage();
+  const key = pkhash;
 
   useEffect(() => {
     if (!key) return;

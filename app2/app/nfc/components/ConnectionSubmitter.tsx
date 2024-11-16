@@ -43,6 +43,15 @@ export default function ConnectionSubmitter() {
       console.log(result);
       setStoreId(result);
       setProgress(2);
+
+      const pkhash = window.localStorage.getItem("pkhash");
+      if (!pkhash) {
+        throw new Error("pkhash is empty, this should not happen");
+      }
+      await axios.post("https://api.nadaplaza.bytes31.com/post-uid-storeid", {
+        uid: pkhash,
+        storeid: result,
+      });
     } catch (err) {
       alert(err);
       setProgress(0);
