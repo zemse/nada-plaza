@@ -31,12 +31,13 @@ async function callApi(apiUrl: string,) {
         const element = a[i];
         try {
         const debug = extractSubstring($(element).html())
-        console.log({debug});
+        if (!debug) {
+            continue;
+        }
         const myRes = extractJson(debug);
         console.log({myRes});
         if (myRes) {
                 result = myRes;
-                break;
             }
         } catch (e) {
             console.error(e);
