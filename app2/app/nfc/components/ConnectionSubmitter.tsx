@@ -1,5 +1,6 @@
 import { useNilStoreValue } from "@nillion/client-react-hooks";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function ConnectionSubmitter() {
   const [connections, setConnections] = useState<string[]>();

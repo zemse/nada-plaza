@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -36,6 +37,7 @@ export default function NFCDataDisplay({ data, onClose }: NFCDataDisplayProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pkhash, setPkhash] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -51,6 +53,14 @@ export default function NFCDataDisplay({ data, onClose }: NFCDataDisplayProps) {
         if (!urlRecord) {
           throw new Error("No valid URL found in NFC tag");
         }
+
+        const parsedUrl = new URL(urlRecord.data);
+        const params = parsedUrl.searchParams;
+        const pk1 = "0x" + params.get("pk1")!;
+        let pk = ethers.dataLength(pk1) == 65 ? ethers.dataSlice(pk1, 1) : pk1;
+        let _pkhash = ethers.keccak256(pk);
+        setPkhash(_pkhash);
+        window.localStorage.setItem("pkhash", _pkhash);
 
         const response = await fetch(
           "https://api.nadaplaza.bytes31.com/trsage",

@@ -6,25 +6,36 @@ import { useNillionAuth } from "@nillion/client-react-hooks";
 export function useWallet() {
   const [key, setKey] = useState("");
   const [address, setAddress] = useState("");
-  const { authenticated, login } = useNillionAuth();
+  const { login } = useNillionAuth();
   const [progress, setProgress] = useState<number>(0);
 
+  // useEffect(() => {
+  //   const key = window.localStorage.getItem("key");
+  //   if (key) {
+  //     setKey(key);
+  //   } else {
+  //     const key = hexlify(randomBytes(32)).slice(2);
+  //     setKey(key);
+  //     window.localStorage.setItem("key", key);
+  //   }
+  // }, []);
+
   useEffect(() => {
-    const key = window.localStorage.getItem("key");
-    if (key) {
-      setKey(key);
-    } else {
-      const key = hexlify(randomBytes(32)).slice(2);
-      setKey(key);
-      window.localStorage.setItem("key", key);
-    }
+    setInterval(async () => {
+      // wait for NFC card to be scanned and the pkhash to be set
+      const key = window.localStorage.getItem("pkhash");
+      if (key) {
+        setKey(key);
+      }
+    }, 50);
   }, []);
 
   useEffect(() => {
     if (!key) return;
 
     (async () => {
-      const wallet = await createSignerFromKey(key);
+      console.log({ key });
+      const wallet = await createSignerFromKey(key.slice(2));
       const acc = await wallet.getAccounts();
       setAddress(acc[0].address);
       setProgress(1);
