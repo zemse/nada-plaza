@@ -18,10 +18,24 @@ export default function WalletComponent() {
           </p>
         </div>
       )}
-      <p>
-        {progress === 1 ? <p>Logging in...</p> : null}
-        {progress === 2 ? <p>Logged in!</p> : null}
-      </p>
+      <div className="mt-4">
+        {progress === 1 && (
+          <div
+            className="text-blue-600 bg-blue-100 border border-blue-300 rounded-md py-2 px-4 text-center max-w-sm mx-auto"
+            style={{ fontWeight: "bold" }}
+          >
+            Logging in...
+          </div>
+        )}
+        {progress === 2 && (
+          <div
+            className="text-green-600 bg-green-100 border border-green-300 rounded-md py-2 px-4 text-center max-w-sm mx-auto"
+            style={{ fontWeight: "bold" }}
+          >
+            Logged in!
+          </div>
+        )}
+      </div>
     </div>
   );
 }
