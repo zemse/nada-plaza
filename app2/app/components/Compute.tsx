@@ -10,7 +10,11 @@ import {
   ProgramId,
   StoreId,
 } from "@nillion/client-core";
-import { useNilCompute, useNillion,useNilFetchValue } from "@nillion/client-react-hooks";
+import {
+  useNilCompute,
+  useNillion,
+  useNilFetchValue,
+} from "@nillion/client-react-hooks";
 
 const stringTo48BitArray = (str: string): bigint[] => {
   const MAX_SIZE = 4;
@@ -44,7 +48,6 @@ const convertArray = (strArray: string[]): bigint[][] => {
   return strArray.map((str) => stringTo48BitArray(str));
 };
 
-
 export const Compute: FC = () => {
   const { client } = useNillion();
   const nilCompute = useNilCompute();
@@ -58,8 +61,8 @@ export const Compute: FC = () => {
     staleAfter: 10000,
   });
 
-  const handleClick = async() => {
-    console.log("inside handleClick")
+  const handleClick = async () => {
+    console.log("inside handleClick");
     if (!programId) throw new Error("compute: program id required");
 
     const bindings = ProgramBindings.create(programId)
@@ -71,15 +74,21 @@ export const Compute: FC = () => {
     // let id = window.localStorage.getItem('id') as string;
     // console.log("id", id);
     console.log("binding done", bindings);
-    
-    let selfData = await nilFetch.executeAsync({ id: storeIdSelf, name: "data" });
-    let otherData = await nilFetch.executeAsync({ id: storeIdOther, name: "data" });
+
+    let selfData = await nilFetch.executeAsync({
+      id: storeIdSelf,
+      name: "data",
+    });
+    let otherData = await nilFetch.executeAsync({
+      id: storeIdOther,
+      name: "data",
+    });
 
     console.log("selfData", selfData);
     console.log("otherData", otherData);
 
-    const selfDataValue = convertArray(JSON.parse((selfData as any)));
-    const otherDataValue = convertArray(JSON.parse((otherData as any)));
+    const selfDataValue = convertArray(JSON.parse(selfData as any));
+    const otherDataValue = convertArray(JSON.parse(otherData as any));
 
     // for (let i = 0; i < 10; i++) {
     //   for (let j = 0; j < 3; j++) {
@@ -98,12 +107,18 @@ export const Compute: FC = () => {
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 4; j++) {
         console.log("NadaValue", selfDataValue[i][j]);
-        console.log("NamedValue.parse", NamedValue.parse("num1_" + i + "_" + j));
-        console.log("NadaValue.createSecretInteger", NadaValue.createSecretInteger(Number(selfDataValue[i][j].toString())));
+        console.log(
+          "NamedValue.parse",
+          NamedValue.parse("num1_" + i + "_" + j),
+        );
+        console.log(
+          "NadaValue.createSecretInteger",
+          NadaValue.createSecretInteger(Number(selfDataValue[i][j].toString())),
+        );
 
         values.insert(
           NamedValue.parse("num1_" + i + "_" + j),
-          NadaValue.createSecretInteger(Number(selfDataValue[i][j].toString()))
+          NadaValue.createSecretInteger(Number(selfDataValue[i][j].toString())),
         );
         console.log("this itr done");
       }
@@ -112,12 +127,22 @@ export const Compute: FC = () => {
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 4; j++) {
         console.log("NadaValue", otherDataValue[i][j]);
-        console.log("NamedValue.parse", NamedValue.parse("num1_" + i + "_" + j));
-        console.log("NadaValue.createSecretInteger", NadaValue.createSecretInteger(Number(otherDataValue[i][j].toString())));
+        console.log(
+          "NamedValue.parse",
+          NamedValue.parse("num1_" + i + "_" + j),
+        );
+        console.log(
+          "NadaValue.createSecretInteger",
+          NadaValue.createSecretInteger(
+            Number(otherDataValue[i][j].toString()),
+          ),
+        );
 
         values.insert(
           NamedValue.parse("num2_" + i + "_" + j),
-          NadaValue.createSecretInteger(Number(otherDataValue[i][j].toString()))
+          NadaValue.createSecretInteger(
+            Number(otherDataValue[i][j].toString()),
+          ),
         );
         console.log("this itr done");
       }
@@ -190,29 +215,26 @@ export const Compute: FC = () => {
     </div>
   );
 
-
-
   async function fetchData(storeId: string): Promise<string[]> {
     nilFetch.executeAsync({ id: storeId, name: "data" });
 
-    return await new Promise(res => {
-      let interval_id =  setInterval(() => {
-         if (nilFetch.isSuccess && nilFetch.data) {
-           try {
-             // @ts-ignore
-             const parsedData: string[] = JSON.parse(nilFetch.data); // Convert JSON string to an array
-             if (Array.isArray(parsedData)) {
-               res(parsedData); // Set the names
-               clearInterval(interval_id)
-             } else {
-               throw new Error("Fetched data is not a valid array");
-             }
-           } catch (error) {
-             console.error("Error parsing fetched data:", error);
-           }
-           
-         }
-       }, 50);
-     });
-   }
+    return await new Promise((res) => {
+      let interval_id = setInterval(() => {
+        if (nilFetch.isSuccess && nilFetch.data) {
+          try {
+            // @ts-ignore
+            const parsedData: string[] = JSON.parse(nilFetch.data); // Convert JSON string to an array
+            if (Array.isArray(parsedData)) {
+              res(parsedData); // Set the names
+              clearInterval(interval_id);
+            } else {
+              throw new Error("Fetched data is not a valid array");
+            }
+          } catch (error) {
+            console.error("Error parsing fetched data:", error);
+          }
+        }
+      }, 50);
+    });
+  }
 };

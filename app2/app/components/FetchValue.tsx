@@ -39,9 +39,9 @@ export default function FetchValue() {
       displayFetchedNames();
     }
   }, [
-    nilFetch.isSuccess, 
+    nilFetch.isSuccess,
     // @ts-ignore
-    nilFetch.data
+    nilFetch.data,
   ]);
 
   return (
@@ -59,8 +59,9 @@ export default function FetchValue() {
 
       {/* Fetch Button */}
       <button
-        className={`flex items-center justify-center w-40 px-4 py-2 mt-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 ${!id || nilFetch.isLoading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+        className={`flex items-center justify-center w-40 px-4 py-2 mt-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 ${
+          !id || nilFetch.isLoading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
         onClick={handleClick}
         disabled={!id || nilFetch.isLoading}
       >

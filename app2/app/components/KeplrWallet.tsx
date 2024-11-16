@@ -24,7 +24,7 @@ const KeplrWalletConnector = () => {
       if (!keplr) {
         throw new Error("Please install Keplr extension");
       }
-    } catch (err:unknown) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -32,17 +32,17 @@ const KeplrWalletConnector = () => {
       }
     }
   };
-  
+
   const addDevnetChain = async () => {
     try {
       await checkKeplr();
-      
+
       const chainId = "nillion-chain-testnet-1";
       const keplr = window.keplr;
       if (!keplr) {
         throw new Error("Keplr not found");
       }
-  
+
       try {
         await keplr.getKey(chainId);
         console.log("Chain already exists in Keplr!");
@@ -51,37 +51,42 @@ const KeplrWalletConnector = () => {
         await keplr.experimentalSuggestChain(config);
       }
       await keplr.enable(chainId);
-    } catch (error:unknown) {
+    } catch (error: unknown) {
       console.error("Error:", error);
-      if (error instanceof Error && error.message.includes("chain not supported")) {
-        console.log("This chain needs to be manually added with chainInfo configuration");
+      if (
+        error instanceof Error &&
+        error.message.includes("chain not supported")
+      ) {
+        console.log(
+          "This chain needs to be manually added with chainInfo configuration",
+        );
       }
       throw error;
     }
   };
-  
+
   const handleLogin = async () => {
     try {
       setIsLoading(true);
       await checkKeplr();
-      
+
       const chainId = "nillion-chain-testnet-1";
       await addDevnetChain();
-      
+
       const keplr = window.keplr;
       if (!keplr) {
         throw new Error("Keplr not found");
       }
-      
+
       const offlineSigner = keplr.getOfflineSigner(chainId);
       const accounts = await offlineSigner.getAccounts();
-      
+
       if (!accounts || accounts.length === 0) {
         throw new Error("No accounts found");
       }
-  
+
       const address = accounts[0].address;
-      setWalletAddress(address);  
+      setWalletAddress(address);
       const credentials: UserCredentials = {
         userSeed: SEED,
       };
@@ -147,7 +152,9 @@ const KeplrWalletConnector = () => {
             onClick={handleLogout}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
-            {walletAddress?.substring(0, 11) + "..." + walletAddress?.substring(walletAddress.length - 3)}
+            {walletAddress?.substring(0, 11) +
+              "..." +
+              walletAddress?.substring(walletAddress.length - 3)}
           </button>
         ) : (
           <button
@@ -158,7 +165,6 @@ const KeplrWalletConnector = () => {
           </button>
         )}
       </div>
-
     </div>
   );
 };

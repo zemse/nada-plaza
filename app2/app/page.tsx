@@ -28,7 +28,7 @@ export default function Home() {
           priority
           className="block dark:hidden"
         />
-        <InstructionsTab/>
+        <InstructionsTab />
         <div className="flex flex-col gap-4 max-w-4xl mx-auto w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center">
             <StoreValue />

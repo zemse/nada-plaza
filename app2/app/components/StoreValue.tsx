@@ -56,7 +56,9 @@ export default function StoreValue() {
       {/* Button to Store the Names */}
       <button
         className={`flex items-center justify-center w-40 px-4 py-2 mt-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 ${
-          names.length === 0 || nilStore.isLoading ? "opacity-50 cursor-not-allowed" : ""
+          names.length === 0 || nilStore.isLoading
+            ? "opacity-50 cursor-not-allowed"
+            : ""
         }`}
         onClick={handleClick}
         disabled={names.length === 0 || nilStore.isLoading}
@@ -75,7 +77,7 @@ export default function StoreValue() {
           {nilStore.isSuccess ? (
             <>
               {`${nilStore.data?.substring(0, 6)}...${nilStore.data?.substring(
-                nilStore.data.length - 6
+                nilStore.data.length - 6,
               )}`}
               <button
                 onClick={() => {
@@ -83,7 +85,7 @@ export default function StoreValue() {
 
                   // Store in window.localStorage
                   if (nilStore.data) {
-                    window.localStorage.setItem('id', nilStore.data);
+                    window.localStorage.setItem("id", nilStore.data);
                   }
                   navigator.clipboard.writeText(nilStore.data);
                   setTimeout(() => setCopied(false), 2000);

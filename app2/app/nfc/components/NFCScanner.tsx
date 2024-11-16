@@ -16,9 +16,20 @@ interface NFCData {
 }
 
 export default function NFCScanner() {
+  let value = {
+    serialNumber: "bf:a5:0e:28",
+    records: [
+      {
+        recordType: "url",
+        data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04E5F2EBA3C08694A541F8094C8065E5B43DB97C2BEE4CDB947BAFA8AA4AFE7B6836EF7AF322D142DF4555A10B12A07345C59FB0A9EF443C969C3526C94C94F4E5&latch1=A978F410877F3140D9CF66E0F4EC2D5061BBEB19E94FDD99D421D3ECB660B1CE&cmd=0000&res=00",
+      },
+    ],
+    timestamp: "11/17/2024, 3:31:27 AM",
+  };
+
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<NFCData | null>(null);
+  const [scannedData, setScannedData] = useState<NFCData | null>(value);
 
   const parseNDEFMessage = (message: any) => {
     return Array.from(message.records).map((record: any) => {
