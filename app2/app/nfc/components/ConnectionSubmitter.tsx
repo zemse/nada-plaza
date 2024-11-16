@@ -53,11 +53,15 @@ export default function ConnectionSubmitter() {
     <p style={{ color: "black" }}>
       <br />
       {progress === 0 ? (
-        <button onClick={handleStore}>Submit Connections to Nillion</button>
+        <button
+          onClick={handleStore}
+          className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-all font-medium"
+        >
+          Submit Connections to Nillion
+        </button>
       ) : null}
 
       {progress === 1 ? <p>Storing connections...</p> : null}
-
       {progress === 2 ? <p>Connections stored! StoreID: {storeId}</p> : null}
     </p>
   );

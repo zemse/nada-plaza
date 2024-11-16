@@ -1,6 +1,8 @@
 import { Scan } from "lucide-react";
 import { useState } from "react";
 import NFCDataDisplay from "./NFCDataDisplay";
+import WalletComponent from "./WalletComponent";
+import ConnectionSubmitter from "./ConnectionSubmitter";
 
 interface NFCData {
   serialNumber: string;
@@ -24,6 +26,7 @@ export default function NFCScanner() {
     ],
     timestamp: "11/17/2024, 3:31:27 AM",
   };
+  // let value = {};
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +37,6 @@ export default function NFCScanner() {
       const recordData: any = {};
       recordData.recordType = record.recordType;
 
-      // Parse different types of records
       if (record.recordType === "text") {
         const textDecoder = new TextDecoder(record.encoding);
         recordData.data = textDecoder.decode(record.data);
@@ -44,7 +46,6 @@ export default function NFCScanner() {
         const textDecoder = new TextDecoder();
         recordData.data = textDecoder.decode(record.data);
       } else {
-        // For other types, convert to hex string
         recordData.data = Array.from(new Uint8Array(record.data))
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
@@ -84,12 +85,12 @@ export default function NFCScanner() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-6 w-full max-w-2xl mx-auto">
+    <div className="flex flex-col items-center justify-center p-4 md:p-8 min-h-screen bg-gray-100">
       {!scannedData && (
         <button
           onClick={startScanning}
           disabled={scanning}
-          className={`flex items-center space-x-2 px-8 py-4 rounded-full text-white font-semibold text-lg transition-all transform hover:scale-105 ${
+          className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-full text-white font-semibold text-lg transition-all transform hover:scale-105 ${
             scanning
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
@@ -101,13 +102,13 @@ export default function NFCScanner() {
       )}
 
       {error && (
-        <div className="text-red-600 bg-red-100 px-4 py-2 rounded-lg">
+        <div className="text-red-600 bg-red-100 px-4 py-2 rounded-lg mt-4 text-center">
           {error}
         </div>
       )}
 
       {!scannedData && (
-        <div className="text-gray-600 text-center max-w-md px-4">
+        <div className="text-gray-600 text-center max-w-md px-4 mt-4">
           {scanning ? (
             <p>Please hold your NFC tag near the device...</p>
           ) : (
@@ -124,6 +125,9 @@ export default function NFCScanner() {
           onClose={() => setScannedData(null)}
         />
       )}
+
+      <WalletComponent />
+      <ConnectionSubmitter />
     </div>
   );
 }

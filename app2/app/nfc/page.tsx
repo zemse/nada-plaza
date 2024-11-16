@@ -3,8 +3,6 @@
 import "./index.css";
 import NFCScanner from "./components/NFCScanner";
 import Footer from "./components/Footer";
-import WalletComponent from "./components/WalletComponent";
-import ConnectionSubmitter from "./components/ConnectionSubmitter";
 
 export default function Home() {
   return (
@@ -12,8 +10,6 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="min-h-[60vh] flex items-center justify-center">
           <NFCScanner />
-          <WalletComponent />
-          <ConnectionSubmitter />
         </div>
       </main>
       <Footer />
