@@ -9,22 +9,11 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import MpcComponent from "./components/MpcComponent";
 
 export default function Home() {
-  const { pkhash, pkhash2 } = useLocalStorage();
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="min-h-[60vh] flex items-center justify-center">
           <NFCScanner />
-
-          {pkhash ? <WalletComponent /> : null}
-
-          {pkhash !== pkhash2 && pkhash2 === undefined ? (
-            <ConnectionSubmitter />
-          ) : null}
-
-          {pkhash !== pkhash2 && pkhash2 !== undefined ? (
-            <MpcComponent />
-          ) : null}
         </div>
       </main>
       <Footer />

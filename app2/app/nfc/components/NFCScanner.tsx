@@ -3,6 +3,8 @@ import { useState } from "react";
 import NFCDataDisplay from "./NFCDataDisplay";
 import WalletComponent from "./WalletComponent";
 import ConnectionSubmitter from "./ConnectionSubmitter";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import MpcComponent from "./MpcComponent";
 
 interface NFCData {
   serialNumber: string;
@@ -97,6 +99,8 @@ export default function NFCScanner() {
     }
   };
 
+  const { pkhash, pkhash2 } = useLocalStorage();
+
   return (
     <div className="flex flex-col items-center justify-center p-4 md:p-8 min-h-screen bg-gray-100">
       {!scannedData && (
@@ -139,8 +143,13 @@ export default function NFCScanner() {
         />
       )}
 
-      <WalletComponent />
-      <ConnectionSubmitter />
+      {pkhash ? <WalletComponent /> : null}
+
+      {pkhash !== pkhash2 && pkhash2 === undefined ? (
+        <ConnectionSubmitter />
+      ) : null}
+
+      {pkhash !== pkhash2 && pkhash2 !== undefined ? <MpcComponent /> : null}
     </div>
   );
 }
