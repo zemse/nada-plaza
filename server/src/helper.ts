@@ -53,21 +53,25 @@ async function extractJson(str: string) {
     for (let i = 0; i < script.length; i++) {
       const element = script[i];
       try {
-        const data = $(element).html()?.replaceAll("\\", "");
+        const data = $(element).html();
         if (data?.includes("bio")) {
-          const regex = /"user":({.*?}})/;
+          // Step 1: Extract the JSON part from the string
+          const jsonStart = data.indexOf("{"); // Find the start of the JSON object
+          const jsonEnd = data.lastIndexOf("}"); // Find the end of the JSON object
 
-          // Use regex to find matches
-          const match = data.match(regex);
-
-          // If a match is found, parse it as JSON
-          if (match && match[1]) {
-            try {
-              return JSON.parse(match[1]);
-            } catch (error) {
-              console.error("Error parsing user data:", error);
-            }
+          if (jsonStart === -1 || jsonEnd === -1) {
+            throw new Error("JSON object not found in the string.");
           }
+
+          const jsonString = data.slice(jsonStart, jsonEnd + 1);
+          // Step 2: Parse the JSON object
+          let parsedData: any;
+          try {
+            parsedData = JSON.parse(JSON.parse(`"${jsonString}"`));
+          } catch (error) {
+            throw new Error("Failed to parse JSON: ");
+          }
+          return parsedData["user"];
         }
       } catch (e) {
         console.error(e);
