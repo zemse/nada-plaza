@@ -30,20 +30,20 @@ export default function NFCScanner() {
   //   timestamp: "11/17/2024, 3:31:27 AM",
   // };
 
-  let val_saurav = {
-    serialNumber: "bf:d7:0d:28",
-    records: [
-      {
-        recordType: "url",
-        data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04034414C24D036EC44F46D093885FB7C5494FEDFAD284B77F021B264F2942AAAE4BDC4E6FCC547F906FAC0E2126E4D672FCBFF6D5CC5877D53FE903A08CF82D68&latch1=74C578821766E9DC6D73E02F2BDE4C827DBED198F82A80B623A37C3057ECE6A5&cmd=0000&res=00",
-      },
-    ],
-    timestamp: "11/17/2024, 6:38:04 AM",
-  };
+  // let val_saurav = {
+  //   serialNumber: "bf:d7:0d:28",
+  //   records: [
+  //     {
+  //       recordType: "url",
+  //       data: "https://nfc.ethglobal.com/?av=A02.03.000001.D1D87DFE&v=01.G1.000005.2BD427BC&pk1=04034414C24D036EC44F46D093885FB7C5494FEDFAD284B77F021B264F2942AAAE4BDC4E6FCC547F906FAC0E2126E4D672FCBFF6D5CC5877D53FE903A08CF82D68&latch1=74C578821766E9DC6D73E02F2BDE4C827DBED198F82A80B623A37C3057ECE6A5&cmd=0000&res=00",
+  //     },
+  //   ],
+  //   timestamp: "11/17/2024, 6:38:04 AM",
+  // };
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<NFCData | null>(val_saurav);
+  const [scannedData, setScannedData] = useState<NFCData | null>();
 
   const parseNDEFMessage = (message: any) => {
     return Array.from(message.records).map((record: any) => {
