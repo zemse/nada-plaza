@@ -64,19 +64,82 @@ export default function ConnectionSubmitter() {
   };
 
   return (
-    <p style={{ color: "black" }}>
-      <br />
-      {progress === 0 ? (
+    <div
+      style={{
+        maxWidth: "600px",
+        margin: "0 auto",
+        padding: "1rem",
+        textAlign: "center",
+        color: "#333",
+        fontFamily: "'Arial', sans-serif",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "1.5rem",
+          fontWeight: "bold",
+          marginBottom: "1.5rem",
+        }}
+      >
+        Submit Your Connections to Nillion
+      </h1>
+      {progress === 0 && (
         <button
           onClick={handleStore}
-          className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-all font-medium"
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#007BFF",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            transition: "background-color 0.3s ease",
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#007BFF")}
         >
-          Submit Connections to Nillion
+          Submit Connections
         </button>
-      ) : null}
+      )}
 
-      {progress === 1 ? <p>Storing connections...</p> : null}
-      {progress === 2 ? <p>Connections stored! StoreID: {storeId}</p> : null}
-    </p>
+      {progress === 1 && (
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "10px",
+            border: "1px solid #ffc107",
+            backgroundColor: "#fff3cd",
+            borderRadius: "5px",
+            color: "#856404",
+          }}
+        >
+          <p>
+            <strong>Storing connections...</strong>
+          </p>
+        </div>
+      )}
+
+      {progress === 2 && storeId && (
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "10px",
+            border: "1px solid #28a745",
+            backgroundColor: "#d4edda",
+            borderRadius: "5px",
+            color: "#155724",
+          }}
+        >
+          <p>
+            <strong>Connections stored successfully!</strong>
+          </p>
+          <p>
+            <strong>Store ID:</strong> {storeId}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
