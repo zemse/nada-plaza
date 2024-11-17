@@ -40,5 +40,11 @@ export function useWallet() {
     })();
   }, [key]);
 
-  return { key, address, progress, login_done: progress === 2 };
+  return {
+    key,
+    nonce_account: key ? "0x" + key.slice(-40) : undefined,
+    address,
+    progress,
+    login_done: progress === 2,
+  };
 }

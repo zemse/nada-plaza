@@ -1,30 +1,31 @@
 import { useNilStoreValue } from "@nillion/client-react-hooks";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useWallet } from "../hooks/useWallet";
+import { ethers } from "ethers";
 
 export default function ConnectionSubmitter() {
   const [connections, setConnections] = useState<string[]>();
   const nilStore = useNilStoreValue();
   const [storeId, setStoreId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
+  const { nonce_account } = useWallet();
 
   useEffect(() => {
-    // TODO call API
-    // pass UID of folks
-    // get back list of connections
-    if (!connections) {
-      setConnections([
-        "Alice",
-        "Bob",
-        "Charlie",
-        "Charlie",
-        "Charlie",
-        "Alice",
-        "Bob",
-        "Charlie",
-        "Charlie",
-        "Charlie",
-      ]);
+    if (!connections && nonce_account) {
+      (async () => {
+        const result = await axios.get(
+          "https://api.nadaplaza.bytes31.com/get-connections?account=" +
+            ethers.getAddress(nonce_account),
+        );
+        console.log("conn res", result.data);
+        const padded_arr = result.data.slice();
+        while (padded_arr.length < 10) {
+          padded_arr.push(ethers.hexlify(ethers.randomBytes(6)).slice(2));
+        }
+        console.log("conn arr", padded_arr);
+        setConnections(padded_arr);
+      })();
     }
   });
 
