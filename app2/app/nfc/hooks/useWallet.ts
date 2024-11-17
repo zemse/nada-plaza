@@ -40,5 +40,5 @@ export function useWallet() {
     })();
   }, [key]);
 
-  return { key, address, progress };
+  return { key, address, progress, login_done: progress === 2 };
 }

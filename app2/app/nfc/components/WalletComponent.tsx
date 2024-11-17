@@ -1,8 +1,12 @@
 import { useWallet } from "../hooks/useWallet";
 
-export default function WalletComponent() {
-  const { address, progress } = useWallet();
+interface Props {
+  address: string;
+  progress: number;
+}
 
+export default function WalletComponent(props: Props) {
+  const { address, progress } = props;
   return (
     <div
       className="flex flex-col items-center justify-center space-y-6 w-full max-w-2xl mx-auto"

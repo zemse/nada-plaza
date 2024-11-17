@@ -5,6 +5,7 @@ import WalletComponent from "./WalletComponent";
 import ConnectionSubmitter from "./ConnectionSubmitter";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import MpcComponent from "./MpcComponent";
+import { useWallet } from "../hooks/useWallet";
 
 interface NFCData {
   serialNumber: string;
@@ -98,6 +99,7 @@ export default function NFCScanner() {
     }
   };
 
+  const { address, progress, login_done } = useWallet();
   const { pkhash, pkhash2 } = useLocalStorage();
 
   return (
@@ -142,9 +144,11 @@ export default function NFCScanner() {
         />
       )}
 
-      {pkhash ? <WalletComponent /> : null}
+      {pkhash ? (
+        <WalletComponent address={address} progress={progress} />
+      ) : null}
 
-      {pkhash !== pkhash2 && pkhash2 === undefined ? (
+      {login_done && pkhash !== pkhash2 && pkhash2 === undefined ? (
         <ConnectionSubmitter />
       ) : null}
 
