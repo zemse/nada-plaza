@@ -15,17 +15,13 @@ import {
   NamedValue,
   PartyName,
   ProgramBindings,
-  ProgramId,
-  StoreId,
 } from "@nillion/client-core";
 
-// const base = "http://localhost:3005";
 const base = "https://api.nadaplaza.bytes31.com";
 
 export default function MpcComponent() {
   const { pkhashStored, pkhashScanned } = usePkHash();
 
-  // program for MPC intersection between 10 items
   const programid =
     "615UmdBm3vxJF9k44bF97Va1Eg8JjyNeRJ1pxr1qY5NivmFZAWN4zrbUVfMnXny5MA4dmPb6cYrPRAiW6AzaPPSx/main";
   const [storeid, setStoreid] = useState<string>();
@@ -34,22 +30,19 @@ export default function MpcComponent() {
   const [progress, setProgress] = useState<number>(0);
 
   useEffect(() => {
-    (async () => {
-      const result = await axios.get(`${base}/get-storeid?uid=${pkhashStored}`);
-      console.log("storeid", result.data);
-      setStoreid(result.data.storeid);
-    })();
-  }, [pkhashStored]);
+    const fetchStoreId = async (uid: string | undefined, setter: Function) => {
+      if (!uid) return;
+      try {
+        const result = await axios.get(`${base}/get-storeid?uid=${uid}`);
+        setter(result.data.storeid);
+      } catch (error) {
+        console.error("Error fetching store ID:", error);
+      }
+    };
 
-  useEffect(() => {
-    (async () => {
-      const result = await axios.get(
-        `${base}/get-storeid?uid=${pkhashScanned}`,
-      );
-      console.log("storeid2", result.data);
-      setStoreid2(result.data.storeid);
-    })();
-  }, [pkhashScanned]);
+    fetchStoreId(pkhashStored, setStoreid);
+    fetchStoreId(pkhashScanned, setStoreid2);
+  }, [pkhashStored, pkhashScanned]);
 
   const { client } = useNillion();
   const nilCompute = useNilCompute();
@@ -59,136 +52,143 @@ export default function MpcComponent() {
   });
   const nilComputeOutput = useNilComputeOutput();
 
-  const perform_mpc = () => {
+  const performMpc = async () => {
     if (!storeid || !storeid2) return;
 
     setProgress(1);
 
-    (async () => {
+    try {
       const bindings = ProgramBindings.create(programid)
         .addInputParty(PartyName.parse("data_owner1"), client.partyId)
         .addInputParty(PartyName.parse("data_owner2"), client.partyId)
         .addOutputParty(PartyName.parse("data_owner1"), client.partyId);
 
-      let selfData = await nilFetch.executeAsync({
-        id: storeid,
-        name: "data",
-      });
-      let otherData = await nilFetch.executeAsync({
-        id: storeid2,
-        name: "data",
-      });
+      const selfData = JSON.parse(
+        (await nilFetch.executeAsync({ id: storeid, name: "data" })) as any,
+      );
+      const otherData = JSON.parse(
+        (await nilFetch.executeAsync({ id: storeid2, name: "data" })) as any,
+      );
 
-      const selfDataValue = convertArray(JSON.parse(selfData as any));
-      const otherDataValue = convertArray(JSON.parse(otherData as any));
+      const selfDataValue = convertArray(selfData);
+      const otherDataValue = convertArray(otherData);
 
       const values = NadaValues.create();
 
       for (let i = 0; i < 10; i++) {
         for (let j = 0; j < 4; j++) {
-          console.log("NadaValue", selfDataValue[i][j]);
-          console.log(
-            "NamedValue.parse",
-            NamedValue.parse("num1_" + i + "_" + j),
-          );
-          console.log(
-            "NadaValue.createSecretInteger",
-            NadaValue.createSecretInteger(
-              Number(selfDataValue[i][j].toString()),
-            ),
-          );
-
           values.insert(
-            NamedValue.parse("num1_" + i + "_" + j),
-            NadaValue.createSecretInteger(
-              Number(selfDataValue[i][j].toString()),
-            ),
+            NamedValue.parse(`num1_${i}_${j}`),
+            NadaValue.createSecretInteger(Number(selfDataValue[i][j])),
           );
-          console.log("this itr done");
+          values.insert(
+            NamedValue.parse(`num2_${i}_${j}`),
+            NadaValue.createSecretInteger(Number(otherDataValue[i][j])),
+          );
         }
       }
 
-      for (let i = 0; i < 10; i++) {
-        for (let j = 0; j < 4; j++) {
-          console.log("NadaValue", otherDataValue[i][j]);
-          console.log(
-            "NamedValue.parse",
-            NamedValue.parse("num1_" + i + "_" + j),
-          );
-          console.log(
-            "NadaValue.createSecretInteger",
-            NadaValue.createSecretInteger(
-              Number(otherDataValue[i][j].toString()),
-            ),
-          );
-
-          values.insert(
-            NamedValue.parse("num2_" + i + "_" + j),
-            NadaValue.createSecretInteger(
-              Number(otherDataValue[i][j].toString()),
-            ),
-          );
-          console.log("this itr done");
-        }
-      }
-
-      const mpc_result = await nilCompute.executeAsync({ bindings, values });
-      console.log("mpc result", mpc_result);
-
-      const output = await nilComputeOutput.executeAsync({ id: mpc_result });
-      console.log(output);
-      setMpcResult((output as any).Score.toString());
+      const mpcResultId = await nilCompute.executeAsync({ bindings, values });
+      const output = await nilComputeOutput.executeAsync({ id: mpcResultId });
+      setMpcResult(output?.Score?.toString());
       setProgress(2);
-    })();
+    } catch (error) {
+      console.error("Error performing MPC:", error);
+      setProgress(0); // Reset progress if there's an error
+    }
   };
 
   return (
-    <div style={{ color: "black", marginTop: "1rem" }}>
-      <h1>
-        <b>Find number of common connections using MPC:</b>
+    <div
+      style={{
+        color: "black",
+        marginTop: "1rem",
+        maxWidth: "600px",
+        margin: "0 auto",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <b>Find Common Connections Using MPC</b>
       </h1>
-      <p>Store ID: {storeid}</p>
-      <p>Store ID 2: {storeid2}</p>
-      {progress === 0 ? (
-        <div
-          className="text-green-600 bg-green-100 border border-green-300 rounded-md py-2 px-4 text-center max-w-sm mx-auto"
-          style={{ fontWeight: "bold" }}
-        >
-          <button onClick={perform_mpc}>Perform MPC</button>
+      <div
+        style={{
+          marginBottom: "1rem",
+          padding: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          background: "#f9f9f9",
+        }}
+      >
+        <p>
+          <strong>Store ID:</strong> {storeid || "Loading..."}
+        </p>
+        <p>
+          <strong>Store ID 2:</strong> {storeid2 || "Loading..."}
+        </p>
+      </div>
+      {progress === 0 && (
+        <div style={{ textAlign: "center" }}>
+          <button
+            onClick={performMpc}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#007BFF",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Perform MPC
+          </button>
         </div>
-      ) : null}
-      {progress === 1 ? <p>Performing MPC...</p> : null}
-      {progress === 2 ? <p>MPC Result: {mpcResult}</p> : null}
+      )}
+      {progress === 1 && (
+        <p style={{ textAlign: "center", color: "#FFA500" }}>
+          <strong>Performing MPC...</strong>
+        </p>
+      )}
+      {progress === 2 && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "1rem",
+            border: "1px solid #28a745",
+            borderRadius: "8px",
+            background: "#d4edda",
+            color: "#155724",
+          }}
+        >
+          <p>
+            <strong>MPC Result:</strong> {mpcResult}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
 function stringTo48BitArray(str: string): bigint[] {
   const MAX_SIZE = 4;
-  const CHUNK_SIZE = 6; // 64 bits = 8 bytes = 8 characters (assuming 1 char = 1 byte in ASCII)
+  const CHUNK_SIZE = 6;
 
-  // Pad or truncate the string to ensure it is the right size
   if (str.length < MAX_SIZE * CHUNK_SIZE) {
-    str = str.padEnd(MAX_SIZE * CHUNK_SIZE, "\0"); // Pad with null characters
+    str = str.padEnd(MAX_SIZE * CHUNK_SIZE, "\0");
   } else if (str.length > MAX_SIZE * CHUNK_SIZE) {
-    str = str.slice(0, MAX_SIZE * CHUNK_SIZE); // Truncate to fit
+    str = str.slice(0, MAX_SIZE * CHUNK_SIZE);
   }
 
-  // Split into chunks of 8 characters and convert to 64-bit integers
   const chunks: bigint[] = [];
   for (let i = 0; i < str.length; i += CHUNK_SIZE) {
     const chunk = str.slice(i, i + CHUNK_SIZE);
     let bigIntValue = BigInt(0);
-
-    // Convert chunk to a bigint by combining character codes
     for (let j = 0; j < chunk.length; j++) {
       bigIntValue = (bigIntValue << 8n) | BigInt(chunk.charCodeAt(j));
     }
-
     chunks.push(bigIntValue);
   }
 
-  return chunks.slice(0, MAX_SIZE); // Ensure size is exactly 3
+  return chunks.slice(0, MAX_SIZE);
 }
 
 function convertArray(strArray: string[]): bigint[][] {
