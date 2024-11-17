@@ -53,17 +53,22 @@ app.get("/get-connections", async (c) => {
     },
     body: JSON.stringify({
       operationName: "getInteractionsSelfPaginated",
-      variables: { pagination: { take: 1000 } },
+      variables: { pagination: { take: 20 } },
       query:
         "query getInteractionsSelfPaginated($pagination: Pagination!, $filters: InteractionFilters) {\n  getInteractionsSelfPaginated(pagination: $pagination, filters: $filters) {\n    uuid\n    type\n    createdAt\n    verifiedAt\n    targetId\n    targetName\n    target {\n      user {\n        name\n        email\n        twitter\n        discord\n        discordId\n        farcaster\n        telegram\n        linkedin\n        github\n        website\n        title\n        bio\n        avatar {\n          fullUrl\n          __typename\n        }\n        __typename\n      }\n      schedule {\n        name\n        __typename\n      }\n      __typename\n    }\n    connectedUser {\n      name\n      title\n      bio\n      email\n      twitter\n      discord\n      discordId\n      farcaster\n      telegram\n      linkedin\n      github\n      website\n      avatar {\n        fullUrl\n        __typename\n      }\n      __typename\n    }\n    event {\n      name\n      timezone {\n        name\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
     }),
   });
   const data = await res.json();
   let result = new Set();
+  console.log(data.data.getInteractionsSelfPaginated[0]);
   data.data.getInteractionsSelfPaginated.forEach((element: any) => {
     if (element.type === "attendee_met") {
       if (element.connectedUser) {
         result.add(element.connectedUser.name);
+      } else if (element.user) {
+        result.add(element.user.name);
+      } else if (element.target) {
+        result.add(element.target.user.name);
       }
     }
   });
