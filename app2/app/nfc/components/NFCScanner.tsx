@@ -3,7 +3,7 @@ import { useState } from "react";
 import NFCDataDisplay from "./NFCDataDisplay";
 import WalletComponent from "./WalletComponent";
 import ConnectionSubmitter from "./ConnectionSubmitter";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { usePkHash } from "../hooks/usePkHash";
 import MpcComponent from "./MpcComponent";
 import { useWallet } from "../hooks/useWallet";
 
@@ -19,7 +19,8 @@ interface NFCData {
 }
 
 export default function NFCScanner() {
-  // let val_garry = {
+  let value = null;
+  // let value = {
   //   serialNumber: "bf:a5:0e:28",
   //   records: [
   //     {
@@ -30,7 +31,7 @@ export default function NFCScanner() {
   //   timestamp: "11/17/2024, 3:31:27 AM",
   // };
 
-  // let val_saurav = {
+  // let value = {
   //   serialNumber: "bf:d7:0d:28",
   //   records: [
   //     {
@@ -43,7 +44,7 @@ export default function NFCScanner() {
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<NFCData | null>();
+  const [scannedData, setScannedData] = useState<NFCData | null>(value);
 
   const parseNDEFMessage = (message: any) => {
     return Array.from(message.records).map((record: any) => {
@@ -100,7 +101,7 @@ export default function NFCScanner() {
   };
 
   const { address, progress, login_done } = useWallet();
-  const { pkhash, pkhash2 } = useLocalStorage();
+  const { pkhashStored, pkhashScanned } = usePkHash();
 
   return (
     <div className="flex flex-col items-center justify-center p-4 md:p-8 min-h-screen bg-gray-100">
@@ -144,15 +145,18 @@ export default function NFCScanner() {
         />
       )}
 
-      {pkhash ? (
-        <WalletComponent address={address} progress={progress} />
+      {pkhashScanned === pkhashStored ? (
+        <>
+          <WalletComponent address={address} progress={progress} />
+          {login_done ? <ConnectionSubmitter /> : null}
+        </>
       ) : null}
 
-      {login_done && pkhash !== pkhash2 && pkhash2 === undefined ? (
-        <ConnectionSubmitter />
+      {pkhashScanned !== pkhashStored &&
+      pkhashScanned !== undefined &&
+      pkhashStored !== undefined ? (
+        <MpcComponent />
       ) : null}
-
-      {pkhash !== pkhash2 && pkhash2 !== undefined ? <MpcComponent /> : null}
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function WalletComponent(props: Props) {
             className="bg-gray-100 text-gray-700 font-bold border border-gray-300 rounded-md py-2 px-4 mx-auto inline-block mt-4"
             style={{ maxWidth: "90%" }}
           >
-            Address: {address}
+            My Address: {address}
           </p>
         </div>
       )}

@@ -3,10 +3,6 @@
 import "./index.css";
 import NFCScanner from "./components/NFCScanner";
 import Footer from "./components/Footer";
-import WalletComponent from "./components/WalletComponent";
-import ConnectionSubmitter from "./components/ConnectionSubmitter";
-import { useLocalStorage } from "./hooks/useLocalStorage";
-import MpcComponent from "./components/MpcComponent";
 
 export default function Home() {
   return (

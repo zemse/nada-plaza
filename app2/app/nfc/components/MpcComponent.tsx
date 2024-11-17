@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { usePkHash } from "../hooks/usePkHash";
 
 import axios from "axios";
 import {
@@ -23,7 +23,7 @@ import {
 const base = "https://api.nadaplaza.bytes31.com";
 
 export default function MpcComponent() {
-  const { pkhash, pkhash2 } = useLocalStorage();
+  const { pkhashStored, pkhashScanned } = usePkHash();
 
   // program for MPC intersection between 10 items
   const programid =
@@ -35,19 +35,21 @@ export default function MpcComponent() {
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get(`${base}/get-storeid?uid=${pkhash}`);
+      const result = await axios.get(`${base}/get-storeid?uid=${pkhashStored}`);
       console.log("storeid", result.data);
       setStoreid(result.data.storeid);
     })();
-  }, [pkhash]);
+  }, [pkhashStored]);
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get(`${base}/get-storeid?uid=${pkhash2}`);
+      const result = await axios.get(
+        `${base}/get-storeid?uid=${pkhashScanned}`,
+      );
       console.log("storeid2", result.data);
       setStoreid2(result.data.storeid);
     })();
-  }, [pkhash2]);
+  }, [pkhashScanned]);
 
   const { client } = useNillion();
   const nilCompute = useNilCompute();
@@ -141,8 +143,10 @@ export default function MpcComponent() {
   };
 
   return (
-    <div style={{ color: "black" }}>
-      <h1>Find number of common connections using MPC:</h1>
+    <div style={{ color: "black", marginTop: "1rem" }}>
+      <h1>
+        <b>Find number of common connections using MPC:</b>
+      </h1>
       <p>Store ID: {storeid}</p>
       <p>Store ID 2: {storeid2}</p>
       {progress === 0 ? (

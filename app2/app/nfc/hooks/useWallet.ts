@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { randomBytes, hexlify } from "ethers";
 import { createSignerFromKey } from "@nillion/client-payments";
 import { useNillionAuth } from "@nillion/client-react-hooks";
-import { useLocalStorage } from "./useLocalStorage";
+import { usePkHash } from "./usePkHash";
 
 export function useWallet() {
   const [address, setAddress] = useState("");
@@ -20,8 +20,8 @@ export function useWallet() {
   //   }
   // }, []);
 
-  const { pkhash } = useLocalStorage();
-  const key = pkhash;
+  const { pkhashStored } = usePkHash();
+  const key = pkhashStored;
 
   useEffect(() => {
     if (!key) return;
