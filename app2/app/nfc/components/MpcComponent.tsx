@@ -4,6 +4,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import axios from "axios";
 import {
   useNilCompute,
+  useNilComputeOutput,
   useNilFetchValue,
   useNillion,
 } from "@nillion/client-react-hooks";
@@ -18,6 +19,9 @@ import {
   StoreId,
 } from "@nillion/client-core";
 
+// const base = "http://localhost:3005";
+const base = "https://api.nadaplaza.bytes31.com";
+
 export default function MpcComponent() {
   const { pkhash, pkhash2 } = useLocalStorage();
 
@@ -31,23 +35,19 @@ export default function MpcComponent() {
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get(
-        `https://api.nadaplaza.bytes31.com/get-storeid?uid=${pkhash}`,
-      );
-      console.log("storeid", result);
+      const result = await axios.get(`${base}/get-storeid?uid=${pkhash}`);
+      console.log("storeid", result.data);
       setStoreid(result.data.storeid);
     })();
-  }, []);
+  }, [pkhash]);
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get(
-        `https://api.nadaplaza.bytes31.com/get-storeid?uid=${pkhash2}`,
-      );
-      console.log("storeid2", result);
+      const result = await axios.get(`${base}/get-storeid?uid=${pkhash2}`);
+      console.log("storeid2", result.data);
       setStoreid2(result.data.storeid);
     })();
-  }, []);
+  }, [pkhash2]);
 
   const { client } = useNillion();
   const nilCompute = useNilCompute();
@@ -55,6 +55,7 @@ export default function MpcComponent() {
     type: "SecretString",
     staleAfter: 10000,
   });
+  const nilComputeOutput = useNilComputeOutput();
 
   const perform_mpc = () => {
     if (!storeid || !storeid2) return;
@@ -129,20 +130,28 @@ export default function MpcComponent() {
         }
       }
 
-      const result = await nilCompute.executeAsync({ bindings, values });
-      console.log("mpc result", result);
-      setMpcResult(result);
+      const mpc_result = await nilCompute.executeAsync({ bindings, values });
+      console.log("mpc result", mpc_result);
+
+      const output = await nilComputeOutput.executeAsync({ id: mpc_result });
+      console.log(output);
+      setMpcResult((output as any).Score.toString());
       setProgress(2);
     })();
   };
 
   return (
     <div style={{ color: "black" }}>
-      <h1>MPC Component</h1>
+      <h1>Find number of common connections using MPC:</h1>
       <p>Store ID: {storeid}</p>
       <p>Store ID 2: {storeid2}</p>
       {progress === 0 ? (
-        <button onClick={perform_mpc}>Perform MPC</button>
+        <div
+          className="text-green-600 bg-green-100 border border-green-300 rounded-md py-2 px-4 text-center max-w-sm mx-auto"
+          style={{ fontWeight: "bold" }}
+        >
+          <button onClick={perform_mpc}>Perform MPC</button>
+        </div>
       ) : null}
       {progress === 1 ? <p>Performing MPC...</p> : null}
       {progress === 2 ? <p>MPC Result: {mpcResult}</p> : null}

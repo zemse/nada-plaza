@@ -18,7 +18,7 @@ interface NFCData {
 }
 
 export default function NFCScanner() {
-  // let value = {
+  // let val_garry = {
   //   serialNumber: "bf:a5:0e:28",
   //   records: [
   //     {
@@ -39,7 +39,6 @@ export default function NFCScanner() {
     ],
     timestamp: "11/17/2024, 6:38:04 AM",
   };
-  // let value = {};
 
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
