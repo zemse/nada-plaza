@@ -10,6 +10,8 @@ export default function ConnectionSubmitter() {
   const [storeId, setStoreId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const { nonce_account } = useWallet();
+  const [isHovered, setIsHovered] = useState(false);
+
 
   useEffect(() => {
     if (!connections && nonce_account) {
@@ -63,6 +65,27 @@ export default function ConnectionSubmitter() {
     }
   };
 
+
+<style>
+  {`
+  .submit-button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+`}
+</style>;
+
   return (
     <div
       style={{
@@ -86,9 +109,11 @@ export default function ConnectionSubmitter() {
       {progress === 0 && (
         <button
           onClick={handleStore}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           style={{
             padding: "10px 20px",
-            backgroundColor: "#007BFF",
+            backgroundColor: isHovered ? "#0056b3" : "#007BFF",
             color: "white",
             border: "none",
             borderRadius: "5px",
@@ -97,8 +122,6 @@ export default function ConnectionSubmitter() {
             fontSize: "1rem",
             transition: "background-color 0.3s ease",
           }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#007BFF")}
         >
           Submit Connections
         </button>
